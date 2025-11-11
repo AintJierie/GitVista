@@ -1,5 +1,54 @@
-GitPulse
+# GitVista
+
 A comprehensive GitHub API analytics and automation suite for developers. Analyze profiles, compare developers, track team metrics, learn GitHub automation patterns, and generate release notes—all powered by the GitHub REST API.
+
+<div align="center">
+
+![GitHub](https://img.shields.io/badge/Built_for-GitHub_Developer_Program-181717?style=for-the-badge&logo=github&logoColor=white)
+![API](https://img.shields.io/badge/GitHub_API-REST_v3-00ADD8?style=for-the-badge&logo=github&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Production_Ready-success?style=for-the-badge)
+
+[🚀 Live Demo](#) • [📖 Documentation](DOCS_INDEX.md) • [✨ Features](#features) • [🎓 Developer Program](#github-developer-program)
+
+</div>
+
+---
+
+## 🎯 GitHub Developer Program Integration
+
+GitVista is built for the **GitHub Developer Program** and demonstrates deep integration with GitHub's REST API:
+
+### API Integration Highlights:
+- ✅ **5+ GitHub API Endpoints** - Users, repos, commits, releases
+- ✅ **Rate Limit Management** - Smart caching and monitoring
+- ✅ **Error Handling** - Graceful failures and user feedback  
+- ✅ **Real-time Data** - Live GitHub statistics and analytics
+- ✅ **Best Practices** - Follows GitHub API guidelines
+
+### Value to GitHub Community:
+- 📊 Professional profile analytics for developers
+- 🔄 Developer comparison and benchmarking tools
+- 👥 Team metrics and composition analysis
+- 🏷️ Automation education (auto-labeler patterns)
+- 📝 Release notes generation from commits
+
+---
+
+## ✨ What's New (Latest Enhancements)
+
+🎨 **Dark Mode** - Toggle between light and dark themes with persistent preferences  
+🕐 **Search History** - Quick access to your last 10 searches  
+📊 **Export Analytics** - Download complete profile data as JSON  
+🔍 **Repository Search** - Filter repositories by name, language, description, or topics  
+⌨️ **Keyboard Shortcuts** - Power user features (Ctrl+K to search, Escape to clear)  
+📱 **Mobile Optimized** - Better responsive design for all devices  
+⚡ **Performance Boost** - 5-minute API caching for faster repeat searches  
+🎯 **Enhanced UX** - Better loading states, notifications, and visual feedback  
+
+[View Complete Enhancement List](ENHANCEMENTS.md) | [Quick Start Guide](QUICK_START.md)
+
+---
 
 ✨ Features
 📊 Analytics Dashboard
@@ -61,13 +110,21 @@ Format as professional markdown
 
 Copy or download release notes instantly
 
-🚀 Quick Start
-Using GitPulse Online
-Open the application in your browser
+## 🚀 Quick Start
+
+### Using GitVista Online
+
+1. Open the application in your browser (or run locally with any web server)
+
+**New Feature**: Toggle dark mode using the theme button in the header
 
 Search for any GitHub username in the Analytics Dashboard
 
+**Pro Tip**: Use keyboard shortcut `Ctrl/Cmd + K` to quickly focus search
+
 Navigate between tabs to explore different tools
+
+**New**: Check your search history by clicking the clock icon
 
 Use Developer Comparison to compare two developers
 
@@ -75,20 +132,30 @@ Check Team Metrics to analyze multiple developers
 
 Generate release notes from any repository
 
-No Setup Required
-GitPulse works entirely in your browser using the public GitHub API. No authentication or backend server needed for basic usage.
+**New**: Export your analytics data as JSON using the download button
+
+📖 [Read the Quick Start Guide](QUICK_START.md) for detailed instructions
+
+### No Setup Required
+
+GitVista works entirely in your browser using the public GitHub API. No authentication or backend server needed for basic usage.
 
 🔧 Technologies Used
-Frontend: HTML5, CSS3, JavaScript (Vanilla)
+Frontend: HTML5, CSS3, JavaScript (Vanilla ES6+)
 
 API: GitHub REST API v3
 
 Charts: Chart.js for data visualization
 
+Storage: LocalStorage for preferences and history caching
+
+Performance: In-memory caching with 5-minute expiration
+
 Hosting: Deployable on GitHub Pages, Vercel, Netlify
 
-📡 GitHub API Integration
-GitPulse demonstrates best practices for GitHub API integration:
+## 📡 GitHub API Integration
+
+GitVista demonstrates best practices for GitHub API integration:
 
 Endpoints Used
 text
@@ -109,12 +176,12 @@ API Features Demonstrated
 
 ✅ Graceful failure modes
 
-Rate Limits
-Unauthenticated requests: 60 per hour
+### Rate Limits
 
-With authentication: 5,000 per hour
+- **Unauthenticated requests**: 60 per hour
+- **With authentication**: 5,000 per hour
 
-GitPulse shows remaining requests for monitoring
+GitVista shows remaining requests for monitoring
 
 📖 How to Use Each Tool
 Analytics Dashboard
@@ -181,17 +248,20 @@ No authentication required: Uses GitHub's public API
 
 Safe to share: Generate shareable links for specific searches
 
-🛠️ Deployment
-Deploy to GitHub Pages
-bash
-git clone https://github.com/yourusername/gitpulse.git
-cd gitpulse
+## 🛠️ Deployment
+
+### Deploy to GitHub Pages
+
+```bash
+git clone https://github.com/yourusername/gitvista.git
+cd gitvista
 # Push to GitHub
 git push origin main
 
 # Enable GitHub Pages in repository settings
 # Select main branch as source
-# Your site will be live at: https://yourusername.github.io/gitpulse
+# Your site will be live at: https://yourusername.github.io/gitvista
+```
 Deploy to Vercel
 bash
 npm install -g vercel
@@ -230,8 +300,9 @@ Real-time data fetching patterns
 
 Pagination and large dataset handling
 
-🤝 Contributing
-Have ideas to improve GitPulse? Contributions welcome!
+## 🤝 Contributing
+
+Have ideas to improve GitVista? Contributions welcome!
 
 Fork the repository
 
@@ -248,12 +319,53 @@ Open a Pull Request
 📝 License
 This project is open source and available under the MIT License.
 
+## 🎓 GitHub Developer Program
+
+GitVista is built as part of the **GitHub Developer Program** initiative to create tools that seamlessly integrate with GitHub.
+
+### Why GitVista for GitHub Developer Program?
+
+**API Integration Excellence:**
+- Uses 5+ GitHub REST API endpoints
+- Demonstrates rate limit management
+- Shows error handling best practices
+- Implements response caching
+- Follows GitHub API guidelines
+
+**Community Value:**
+- Helps developers showcase their GitHub profiles
+- Enables team analysis and metrics
+- Educates about GitHub automation
+- Generates professional release notes
+- Free and open source
+
+**Technical Quality:**
+- Production-ready code
+- Comprehensive documentation
+- Fully responsive design
+- Accessibility compliant
+- Performance optimized
+
+### GitHub API Endpoints Used:
+```
+GET /users/{username}                 - User profile information
+GET /users/{username}/repos           - User repositories  
+GET /repos/{owner}/{repo}             - Repository details
+GET /repos/{owner}/{repo}/commits     - Repository commits
+Response Headers                       - Rate limit monitoring
+```
+
+### Join the GitHub Developer Program:
+Interested in building GitHub integrations? [Learn more about the GitHub Developer Program](https://docs.github.com/en/developers/overview/github-developer-program)
+
 🙏 Acknowledgments
 Built with ❤️ for the GitHub Developer Program
 
 Powered by GitHub REST API
 
 Data visualization with Chart.js
+
+Octocat logo used with permission from GitHub
 
 📞 Support
 For issues, questions, or suggestions:

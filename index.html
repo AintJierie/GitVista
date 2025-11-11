@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitVista - GitHub Developer Tools Suite</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">GitVista</h1>
+                <p class="app-subtitle">Comprehensive toolkit for GitHub developers and teams</p>
+            </div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="btn btn--icon" title="Toggle theme">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <button id="history-toggle" class="btn btn--icon" title="Search history">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </button>
+                <button id="export-data-btn" class="btn btn--icon" title="Export data">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                </button>
+            </div>
+            <!-- Navigation Tabs -->
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="analytics">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="20" x2="12" y2="10"></line>
+                        <line x1="18" y1="20" x2="18" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="16"></line>
+                    </svg>
+                    Analytics Dashboard
+                </button>
+                <button class="nav-tab" data-tab="comparison">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Developer Comparison
+                </button>
+                <button class="nav-tab" data-tab="team">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Team Metrics
+                </button>
+                <button class="nav-tab" data-tab="labeler">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                        <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                    </svg>
+                    Auto-Labeler
+                </button>
+                <button class="nav-tab" data-tab="release">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                        <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                    </svg>
+                    Release Notes
+                </button>
+            </nav>
+        </header>
+        
+        <!-- Search History Dropdown -->
+        <div id="history-dropdown" class="history-dropdown hidden">
+            <div class="history-header">
+                <h3>Recent Searches</h3>
+                <button id="clear-history-btn" class="btn btn--sm btn--ghost">Clear All</button>
+            </div>
+            <div id="history-list" class="history-list"></div>
+        </div>
+
+        <!-- Rate Limit Display -->
+        <div class="rate-limit-container">
+            <div class="rate-limit-info">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span id="rate-limit-text">API Rate Limit: <strong id="rate-limit-remaining">--</strong> / <strong id="rate-limit-total">60</strong> remaining</span>
+            </div>
+        </div>
+
+        <!-- TOOL 1: Analytics Dashboard -->
+        <div id="tab-analytics" class="tab-content active">
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input 
+                        type="text" 
+                        id="username-input" 
+                        class="form-control search-input" 
+                        placeholder="Enter GitHub username (e.g., torvalds)"
+                        value="torvalds"
+                        autocomplete="off"
+                    />
+                    <button id="clear-search-btn" class="btn btn--icon btn--ghost clear-search hidden" title="Clear">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <button id="search-btn" class="btn btn--primary search-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    Analyze Profile
+                </button>
+            </div>
+            <div class="quick-actions">
+                <span class="quick-action-label">Quick actions:</span>
+                <kbd>Enter</kbd> to search
+                <kbd>Ctrl</kbd> + <kbd>K</kbd> for shortcuts
+            </div>
+        </section>
+
+        <!-- Loading Spinner -->
+        <div id="loading-spinner" class="loading-spinner hidden">
+            <div class="spinner"></div>
+            <p>Fetching GitHub data...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error-message" class="error-message hidden">
+            <div class="error-content">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span id="error-text"></span>
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboard" class="dashboard hidden">
+            <!-- Profile Section -->
+            <section class="profile-section">
+                <div class="profile-card card">
+                    <div class="profile-header">
+                        <img id="user-avatar" src="" alt="User Avatar" class="user-avatar">
+                        <div class="profile-info">
+                            <h2 id="user-name" class="user-name"></h2>
+                            <a id="user-link" href="" target="_blank" class="user-username"></a>
+                            <p id="user-bio" class="user-bio"></p>
+                            <p id="user-location" class="user-location hidden"></p>
+                            <button id="copy-profile-btn" class="btn btn--sm btn--secondary copy-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                Copy Profile Link
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card card">
+                        <div class="stat-icon" style="background: var(--color-bg-1);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Public Repositories</p>
+                            <p id="stat-repos" class="stat-value">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card card">
+                        <div class="stat-icon" style="background: var(--color-bg-2);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Followers</p>
+                            <p id="stat-followers" class="stat-value">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card card">
+                        <div class="stat-icon" style="background: var(--color-bg-3);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="8.5" cy="7" r="4"></circle>
+                                <line x1="23" y1="11" x2="17" y2="11"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Following</p>
+                            <p id="stat-following" class="stat-value">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card card">
+                        <div class="stat-icon" style="background: var(--color-bg-4);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Public Gists</p>
+                            <p id="stat-gists" class="stat-value">0</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Repository Statistics -->
+            <section class="repo-stats-section">
+                <h2 class="section-title">Repository Statistics</h2>
+                <div class="repo-stats-grid">
+                    <div class="repo-stat-card card">
+                        <div class="repo-stat-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="repo-stat-label">Total Stars</p>
+                            <p id="total-stars" class="repo-stat-value">0</p>
+                        </div>
+                    </div>
+                    <div class="repo-stat-card card">
+                        <div class="repo-stat-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="18" cy="5" r="3"></circle>
+                                <circle cx="6" cy="12" r="3"></circle>
+                                <circle cx="18" cy="19" r="3"></circle>
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="repo-stat-label">Total Forks</p>
+                            <p id="total-forks" class="repo-stat-value">0</p>
+                        </div>
+                    </div>
+                    <div class="repo-stat-card card">
+                        <div class="repo-stat-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="repo-stat-label">Average Size</p>
+                            <p id="avg-size" class="repo-stat-value">0 KB</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Top Repositories -->
+            <section class="top-repos-section">
+                <div class="section-header">
+                    <h2 class="section-title">Top Repositories</h2>
+                    <div class="repo-controls">
+                        <div class="search-repos-wrapper">
+                            <input 
+                                type="text" 
+                                id="repo-search" 
+                                class="form-control repo-search-input" 
+                                placeholder="Filter repositories..."
+                            />
+                        </div>
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" data-sort="stars">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                </svg>
+                                Stars
+                            </button>
+                            <button class="filter-btn" data-sort="forks">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="18" cy="5" r="3"></circle>
+                                    <circle cx="6" cy="12" r="3"></circle>
+                                    <circle cx="18" cy="19" r="3"></circle>
+                                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                                </svg>
+                                Forks
+                            </button>
+                            <button class="filter-btn" data-sort="updated">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                Recent
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="top-repos" class="repos-list"></div>
+                <button id="load-more-repos" class="btn btn--secondary btn--block hidden">Load More Repositories</button>
+            </section>
+
+            <!-- Language Breakdown & Recent Activity -->
+            <div class="two-column-section">
+                <section class="language-section">
+                    <h2 class="section-title">Language Distribution</h2>
+                    <div class="card chart-card">
+                        <canvas id="language-chart"></canvas>
+                    </div>
+                </section>
+
+                <section class="activity-section">
+                    <h2 class="section-title">Recent Activity</h2>
+                    <div id="recent-activity" class="activity-list"></div>
+                </section>
+            </div>
+        </div>
+        </div>
+
+        <!-- TOOL 2: Developer Comparison -->
+        <div id="tab-comparison" class="tab-content">
+            <section class="search-section">
+                <div class="comparison-search-container">
+                    <div class="developer-input-group">
+                        <label class="form-label">Developer 1</label>
+                        <input type="text" id="dev1-input" class="form-control" placeholder="Enter username (e.g., torvalds)">
+                    </div>
+                    <div class="developer-input-group">
+                        <label class="form-label">Developer 2</label>
+                        <input type="text" id="dev2-input" class="form-control" placeholder="Enter username (e.g., gvanrossum)">
+                    </div>
+                </div>
+                <button id="compare-btn" class="btn btn--primary search-btn">Compare Developers</button>
+            </section>
+            <div id="comparison-results" class="comparison-results hidden"></div>
+        </div>
+
+        <!-- TOOL 3: Team Metrics -->
+        <div id="tab-team" class="tab-content">
+            <section class="search-section">
+                <div class="team-input-container">
+                    <label class="form-label">Team Members (comma-separated or one per line)</label>
+                    <textarea id="team-input" class="form-control team-textarea" placeholder="torvalds, gvanrossum, octocat" rows="4"></textarea>
+                </div>
+                <button id="analyze-team-btn" class="btn btn--primary search-btn">Analyze Team</button>
+            </section>
+            <div id="team-results" class="team-results hidden"></div>
+        </div>
+
+        <!-- TOOL 4: Auto-Labeler Config -->
+        <div id="tab-labeler" class="tab-content">
+            <section class="tool-section">
+                <h2 class="section-title">GitHub Auto-Labeler Configuration</h2>
+                <p class="tool-description">Learn how to automate GitHub issue and PR labeling using patterns and the GitHub API.</p>
+                
+                <div class="labeler-content">
+                    <div class="card info-card">
+                        <h3 class="info-title">Label Mapping Rules</h3>
+                        <p class="info-text">Configure automatic labels based on keywords found in issues and pull requests:</p>
+                        <div class="label-rules">
+                            <div class="label-rule"><span class="label-badge" style="background: #d73a49;">bug</span> → error, crash, broken, fix</div>
+                            <div class="label-rule"><span class="label-badge" style="background: #28a745;">feature</span> → new, add, implement, enhancement</div>
+                            <div class="label-rule"><span class="label-badge" style="background: #0366d6;">documentation</span> → docs, readme, guide, tutorial</div>
+                            <div class="label-rule"><span class="label-badge" style="background: #fdbf4f;">help-wanted</span> → help, assist, question</div>
+                            <div class="label-rule"><span class="label-badge" style="background: #7057ff;">good-first-issue</span> → beginner, easy, simple, first</div>
+                        </div>
+                    </div>
+
+                    <div class="card code-card">
+                        <h3 class="info-title">Sample Configuration JSON</h3>
+                        <pre><code id="labeler-json">{{
+  "labelRules": [
+    {{"keywords": ["bug", "error", "crash"], "label": "bug", "color": "d73a49"}},
+    {{"keywords": ["feature", "new", "add"], "label": "feature", "color": "28a745"}},
+    {{"keywords": ["docs", "readme"], "label": "documentation", "color": "0366d6"}}
+  ]
+}}</code></pre>
+                        <button class="btn btn--secondary btn--sm copy-code-btn" data-target="labeler-json">Copy JSON</button>
+                    </div>
+
+                    <div class="card code-card">
+                        <h3 class="info-title">GitHub API Example (Create Label)</h3>
+                        <pre><code id="api-example">curl -X POST \
+  https://api.github.com/repos/OWNER/REPO/labels \
+  -H "Authorization: token YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{{
+    "name": "bug",
+    "color": "d73a49",
+    "description": "Something isn't working"
+  }}'</code></pre>
+                        <button class="btn btn--secondary btn--sm copy-code-btn" data-target="api-example">Copy Code</button>
+                    </div>
+
+                    <div class="card code-card">
+                        <h3 class="info-title">GitHub Actions Workflow</h3>
+                        <pre><code id="actions-example">name: Auto Label
+on:
+  issues:
+    types: [opened, edited]
+  pull_request:
+    types: [opened, edited]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/labeler@v4
+        with:
+          repo-token: ${{{{ secrets.GITHUB_TOKEN }}}}</code></pre>
+                        <button class="btn btn--secondary btn--sm copy-code-btn" data-target="actions-example">Copy Workflow</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- TOOL 5: Release Notes Generator -->
+        <div id="tab-release" class="tab-content">
+            <section class="search-section">
+                <div class="release-input-container">
+                    <div class="release-input-group">
+                        <label class="form-label">GitHub Username</label>
+                        <input type="text" id="release-username" class="form-control" placeholder="e.g., torvalds">
+                    </div>
+                    <div class="release-input-group">
+                        <label class="form-label">Repository Name</label>
+                        <input type="text" id="release-repo" class="form-control" placeholder="e.g., linux">
+                    </div>
+                    <div class="release-input-group">
+                        <label class="form-label">Version (optional)</label>
+                        <input type="text" id="release-version" class="form-control" placeholder="e.g., v1.0.0">
+                    </div>
+                </div>
+                <button id="generate-release-btn" class="btn btn--primary search-btn">Generate Release Notes</button>
+            </section>
+            <div id="release-results" class="release-results hidden"></div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-branding">
+                    <img src="assets/github-logos/GitHub_Logo.png" alt="GitHub Logo" class="github-logo" />
+                    <div class="footer-text">
+                        <p>Powered by <a href="https://docs.github.com/en/rest" target="_blank" rel="noopener noreferrer">GitHub REST API</a></p>
+                        <p class="footer-version">GitVista v2.0.0 • Built for the GitHub Developer Program</p>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <a href="https://github.com/AintJierie/GitPulse" target="_blank">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        View on GitHub
+                    </a>
+                    <a href="DOCS_INDEX.md" target="_blank">Documentation</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
