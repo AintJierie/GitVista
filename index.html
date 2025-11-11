@@ -15,6 +15,30 @@
                 <p class="app-subtitle">Comprehensive toolkit for GitHub developers and teams</p>
             </div>
             <div class="header-actions">
+                <!-- User Auth Info -->
+                <div id="user-auth-info" class="user-auth-info hidden">
+                    <img id="auth-user-avatar" src="" alt="User Avatar" class="auth-avatar">
+                    <span id="auth-username" class="auth-username"></span>
+                </div>
+                
+                <!-- Login/Logout Buttons -->
+                <button id="login-btn" class="btn btn--primary btn--sm">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                        <polyline points="10 17 15 12 10 7"></polyline>
+                        <line x1="15" y1="12" x2="3" y2="12"></line>
+                    </svg>
+                    Sign in with GitHub
+                </button>
+                <button id="logout-btn" class="btn btn--ghost btn--sm hidden">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Sign out
+                </button>
+                
                 <button id="theme-toggle" class="btn btn--icon" title="Toggle theme">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -95,7 +119,16 @@
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
-                <span id="rate-limit-text">API Rate Limit: <strong id="rate-limit-remaining">--</strong> / <strong id="rate-limit-total">60</strong> remaining</span>
+                <span id="rate-limit-text">
+                    <span class="rate-limit-status">
+                        <span class="status-badge unauthenticated">Unauthenticated</span>
+                        <span class="status-badge authenticated hidden">Authenticated</span>
+                    </span>
+                    API Limit: <strong id="rate-limit-remaining">--</strong> / <strong id="rate-limit-total">60</strong> remaining
+                </span>
+            </div>
+            <div class="rate-limit-info-hint">
+                <small>💡 Sign in with GitHub for 5,000 requests/hour + access to private repos</small>
             </div>
         </div>
 

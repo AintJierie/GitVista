@@ -20,13 +20,17 @@ A comprehensive GitHub API analytics and automation suite for developers. Analyz
 GitVista is built for the **GitHub Developer Program** and demonstrates deep integration with GitHub's REST API:
 
 ### API Integration Highlights:
+- ✅ **GitHub OAuth Authentication** - Secure sign-in with GitHub accounts
+- ✅ **Enhanced Rate Limits** - 5,000 requests/hour (vs 60 unauthenticated)
+- ✅ **Private Repository Access** - Analyze private repos when authenticated
 - ✅ **5+ GitHub API Endpoints** - Users, repos, commits, releases
-- ✅ **Rate Limit Management** - Smart caching and monitoring
+- ✅ **Smart Rate Limit Management** - Caching and monitoring
 - ✅ **Error Handling** - Graceful failures and user feedback  
 - ✅ **Real-time Data** - Live GitHub statistics and analytics
-- ✅ **Best Practices** - Follows GitHub API guidelines
+- ✅ **Security Best Practices** - OAuth state validation, secure token storage
 
 ### Value to GitHub Community:
+- 🔐 Secure authentication with OAuth 2.0
 - 📊 Professional profile analytics for developers
 - 🔄 Developer comparison and benchmarking tools
 - 👥 Team metrics and composition analysis
@@ -37,6 +41,7 @@ GitVista is built for the **GitHub Developer Program** and demonstrates deep int
 
 ## ✨ What's New (Latest Enhancements)
 
+🔐 **GitHub OAuth Authentication** - Sign in with GitHub for full access and higher rate limits  
 🎨 **Dark Mode** - Toggle between light and dark themes with persistent preferences  
 🕐 **Search History** - Quick access to your last 10 searches  
 📊 **Export Analytics** - Download complete profile data as JSON  
@@ -46,7 +51,7 @@ GitVista is built for the **GitHub Developer Program** and demonstrates deep int
 ⚡ **Performance Boost** - 5-minute API caching for faster repeat searches  
 🎯 **Enhanced UX** - Better loading states, notifications, and visual feedback  
 
-[View Complete Enhancement List](ENHANCEMENTS.md) | [Quick Start Guide](QUICK_START.md)
+[View Complete Enhancement List](ENHANCEMENTS.md) | [Quick Start Guide](QUICK_START.md) | [OAuth Setup Guide](OAUTH_SETUP_GUIDE.md)
 
 ---
 
@@ -75,7 +80,22 @@ Analyze coding patterns and productivity
 
 Highlight strengths of each developer
 
-👥 Team Metrics
+� GitHub OAuth Authentication
+Sign in with your GitHub account for full access
+
+5,000 API requests/hour (vs 60 unauthenticated)
+
+Access your private repositories
+
+Secure OAuth 2.0 authentication flow
+
+Persistent session management
+
+View authenticated user profile in header
+
+Real-time rate limit monitoring
+
+�👥 Team Metrics
 Analyze multiple team members simultaneously
 
 Combined team statistics and aggregated metrics
