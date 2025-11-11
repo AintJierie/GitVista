@@ -654,9 +654,12 @@ async function fetchGitHubAPI(endpoint, options = {}) {
   return response;
 }
 
-// Fetch User Data
+// Fetch User Data (handles private repo counts when viewing own profile)
 async function fetchUserData(username) {
-  const response = await fetchGitHubAPI(`/users/${username}`);
+  // If authenticated and viewing own profile, use /user endpoint to access private stats
+  const isSelf = isAuthenticated && authenticatedUser && authenticatedUser.login.toLowerCase() === username.toLowerCase();
+  const endpoint = isSelf ? '/user' : `/users/${username}`;
+  const response = await fetchGitHubAPI(endpoint);
   updateRateLimit(response);
   
   if (response.status === 404) {
@@ -674,9 +677,17 @@ async function fetchUserData(username) {
   return await response.json();
 }
 
-// Fetch User Repositories
+// Fetch User Repositories (includes private repos if viewing own profile with proper scope)
 async function fetchUserRepositories(username) {
-  const response = await fetchGitHubAPI(`/users/${username}/repos?per_page=100&sort=updated`);
+  const isSelf = isAuthenticated && authenticatedUser && authenticatedUser.login.toLowerCase() === username.toLowerCase();
+  let endpoint;
+  if (isSelf) {
+    // visibility=all covers public + private; affiliation broadens access (owner, collaborator, org member)
+    endpoint = '/user/repos?per_page=100&sort=updated&visibility=all&affiliation=owner,collaborator,organization_member';
+  } else {
+    endpoint = `/users/${username}/repos?per_page=100&sort=updated`;
+  }
+  const response = await fetchGitHubAPI(endpoint);
   updateRateLimit(response);
   
   if (response.status === 403) {
@@ -713,7 +724,22 @@ function displayUserProfile(user) {
     locationElement.classList.add('hidden');
   }
   
+  // Public repos
   document.getElementById('stat-repos').textContent = formatNumber(user.public_repos);
+
+  // Private repo stats (only if self and data available)
+  const privateReposEl = document.getElementById('stat-private-repos');
+  const privateWrapper = document.getElementById('stat-private-wrapper');
+  const isSelf = isAuthenticated && authenticatedUser && authenticatedUser.login === user.login;
+  if (privateReposEl && privateWrapper) {
+    if (isSelf && (typeof user.total_private_repos === 'number' || typeof user.owned_private_repos === 'number')) {
+      const privateCount = user.total_private_repos ?? user.owned_private_repos ?? 0;
+      privateReposEl.textContent = formatNumber(privateCount);
+      privateWrapper.classList.remove('hidden');
+    } else {
+      privateWrapper.classList.add('hidden');
+    }
+  }
   document.getElementById('stat-followers').textContent = formatNumber(user.followers);
   document.getElementById('stat-following').textContent = formatNumber(user.following);
   document.getElementById('stat-gists').textContent = formatNumber(user.public_gists);
