@@ -1,6 +1,14 @@
 // GitHub API Configuration
 const GITHUB_API_BASE = 'https://api.github.com';
 
+// GitHub OAuth Configuration
+const GITHUB_OAUTH_CONFIG = {
+  clientId: 'YOUR_GITHUB_CLIENT_ID', // Replace with your GitHub OAuth App Client ID
+  redirectUri: 'https://aintjierie.github.io/GitPulse/', // Fixed: using correct repo name
+  scope: 'read:user,repo,read:org',
+  authUrl: 'https://github.com/login/oauth/authorize'
+};
+
 // State Management
 let currentUsername = '';
 let allRepositories = [];
@@ -15,6 +23,11 @@ let searchHistory = [];
 let currentTheme = 'light';
 let repoSortBy = 'stars';
 let debounceTimer = null;
+
+// OAuth State Management
+let accessToken = null;
+let authenticatedUser = null;
+let isAuthenticated = false;
 
 // Cache for API responses
 const apiCache = new Map();
@@ -60,10 +73,23 @@ const releaseVersionInput = document.getElementById('release-version');
 const generateReleaseBtn = document.getElementById('generate-release-btn');
 const releaseResults = document.getElementById('release-results');
 
+// DOM Elements - OAuth
+const loginBtn = document.getElementById('login-btn');
+const logoutBtn = document.getElementById('logout-btn');
+const userAuthInfo = document.getElementById('user-auth-info');
+const authUserAvatar = document.getElementById('auth-user-avatar');
+const authUsername = document.getElementById('auth-username');
+
 // Initialize App
 function init() {
   // Load saved preferences
   loadPreferences();
+  
+  // Check for OAuth callback
+  handleOAuthCallback();
+  
+  // Load saved token and authenticate
+  loadAccessToken();
   
   // Apply saved theme
   applyTheme(currentTheme);
@@ -122,6 +148,10 @@ function init() {
   // Release Notes Generator
   generateReleaseBtn.addEventListener('click', handleReleaseGeneration);
   
+  // OAuth Authentication
+  if (loginBtn) loginBtn.addEventListener('click', initiateGitHubLogin);
+  if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+  
   // Keyboard shortcuts
   document.addEventListener('keydown', handleKeyboardShortcuts);
 
@@ -159,6 +189,206 @@ function savePreferences() {
     console.error('Error saving preferences:', error);
   }
 }
+
+// ============================================
+// GitHub OAuth Authentication Functions
+// ============================================
+
+// Initiate GitHub OAuth login
+function initiateGitHubLogin() {
+  // Generate random state for security
+  const state = generateRandomState();
+  sessionStorage.setItem('oauth_state', state);
+  
+  // Build OAuth authorization URL
+  const params = new URLSearchParams({
+    client_id: GITHUB_OAUTH_CONFIG.clientId,
+    redirect_uri: GITHUB_OAUTH_CONFIG.redirectUri,
+    scope: GITHUB_OAUTH_CONFIG.scope,
+    state: state,
+    allow_signup: 'true'
+  });
+  
+  const authUrl = `${GITHUB_OAUTH_CONFIG.authUrl}?${params.toString()}`;
+  
+  // Redirect to GitHub OAuth
+  window.location.href = authUrl;
+}
+
+// Handle OAuth callback
+function handleOAuthCallback() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const code = urlParams.get('code');
+  const state = urlParams.get('state');
+  const savedState = sessionStorage.getItem('oauth_state');
+  
+  if (code && state) {
+    // Verify state matches
+    if (state !== savedState) {
+      showError('OAuth state mismatch. Possible security issue.');
+      return;
+    }
+    
+    // Clear state
+    sessionStorage.removeItem('oauth_state');
+    
+    // Exchange code for access token
+    // Note: In production, this should be done server-side
+    exchangeCodeForToken(code);
+    
+    // Clean up URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+}
+
+// Exchange authorization code for access token
+async function exchangeCodeForToken(code) {
+  try {
+    // NOTE: This is a client-side workaround. In production, you should:
+    // 1. Send the code to your backend server
+    // 2. Your server exchanges it for an access token using your client secret
+    // 3. Your server returns the token to the client
+    
+    // For development/demo purposes, we'll show how to use the token
+    // You'll need to set up a backend proxy or use GitHub Apps
+    
+    showNotification('Authentication successful! Please configure backend token exchange.', 'info');
+    
+    // For now, users can manually input their Personal Access Token
+    const token = prompt('Enter your GitHub Personal Access Token (with repo and user scopes):\n\nNote: In production, this would be handled automatically via OAuth.');
+    
+    if (token) {
+      accessToken = token;
+      localStorage.setItem('github_access_token', token);
+      await authenticateUser();
+    }
+    
+  } catch (error) {
+    console.error('OAuth exchange error:', error);
+    showError('Failed to complete authentication');
+  }
+}
+
+// Authenticate user with access token
+async function authenticateUser() {
+  if (!accessToken) return;
+  
+  try {
+    const response = await fetchGitHubAPI('/user');
+    
+    if (response.ok) {
+      authenticatedUser = await response.json();
+      isAuthenticated = true;
+      updateAuthUI();
+      checkRateLimit();
+      showNotification(`Welcome back, ${authenticatedUser.login}!`, 'success');
+    } else {
+      throw new Error('Authentication failed');
+    }
+  } catch (error) {
+    console.error('Authentication error:', error);
+    clearAccessToken();
+    showError('Authentication failed. Please try again.');
+  }
+}
+
+// Load access token from localStorage
+function loadAccessToken() {
+  const savedToken = localStorage.getItem('github_access_token');
+  if (savedToken) {
+    accessToken = savedToken;
+    authenticateUser();
+  } else {
+    updateAuthUI();
+  }
+}
+
+// Clear access token
+function clearAccessToken() {
+  accessToken = null;
+  authenticatedUser = null;
+  isAuthenticated = false;
+  localStorage.removeItem('github_access_token');
+  updateAuthUI();
+}
+
+// Handle logout
+function handleLogout() {
+  if (confirm('Are you sure you want to log out?')) {
+    clearAccessToken();
+    showNotification('Logged out successfully', 'success');
+    
+    // Clear any cached data
+    apiCache.clear();
+    
+    // Reset dashboard
+    dashboard.classList.add('hidden');
+    
+    // Check rate limit (will show unauthenticated limit)
+    checkRateLimit();
+  }
+}
+
+// Update authentication UI
+function updateAuthUI() {
+  if (isAuthenticated && authenticatedUser) {
+    // Show authenticated state
+    if (loginBtn) loginBtn.classList.add('hidden');
+    if (logoutBtn) logoutBtn.classList.remove('hidden');
+    if (userAuthInfo) userAuthInfo.classList.remove('hidden');
+    if (authUserAvatar) authUserAvatar.src = authenticatedUser.avatar_url;
+    if (authUsername) authUsername.textContent = authenticatedUser.login;
+    
+    // Update rate limit display
+    document.querySelector('.rate-limit-container').classList.add('authenticated');
+  } else {
+    // Show unauthenticated state
+    if (loginBtn) loginBtn.classList.remove('hidden');
+    if (logoutBtn) logoutBtn.classList.add('hidden');
+    if (userAuthInfo) userAuthInfo.classList.add('hidden');
+    
+    // Update rate limit display
+    document.querySelector('.rate-limit-container').classList.remove('authenticated');
+  }
+}
+
+// Generate random state for OAuth
+function generateRandomState() {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+// Show notification
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = `notification notification--${type}`;
+  notification.innerHTML = `
+    <div class="notification-content">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        ${type === 'success' ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>' : 
+          type === 'error' ? '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>' :
+          '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>'}
+      </svg>
+      <span>${message}</span>
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Animate in
+  setTimeout(() => notification.classList.add('show'), 10);
+  
+  // Remove after 4 seconds
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => notification.remove(), 300);
+  }, 4000);
+}
+
+// ============================================
+// End OAuth Functions
+// ============================================
 
 // Theme Management
 function toggleTheme() {
@@ -395,9 +625,38 @@ function showNotification(message, type = 'info') {
   }, 3000);
 }
 
+// ============================================
+// GitHub API Helper Functions
+// ============================================
+
+// Helper function to make authenticated GitHub API calls
+async function fetchGitHubAPI(endpoint, options = {}) {
+  const headers = {
+    'Accept': 'application/vnd.github.v3+json',
+    ...options.headers
+  };
+  
+  // Add authentication token if available
+  if (accessToken) {
+    headers['Authorization'] = `Bearer ${accessToken}`;
+  }
+  
+  const url = endpoint.startsWith('http') ? endpoint : `${GITHUB_API_BASE}${endpoint}`;
+  
+  const response = await fetch(url, {
+    ...options,
+    headers
+  });
+  
+  // Update rate limit info
+  updateRateLimit(response);
+  
+  return response;
+}
+
 // Fetch User Data
 async function fetchUserData(username) {
-  const response = await fetch(`${GITHUB_API_BASE}/users/${username}`);
+  const response = await fetchGitHubAPI(`/users/${username}`);
   updateRateLimit(response);
   
   if (response.status === 404) {
@@ -417,7 +676,7 @@ async function fetchUserData(username) {
 
 // Fetch User Repositories
 async function fetchUserRepositories(username) {
-  const response = await fetch(`${GITHUB_API_BASE}/users/${username}/repos?per_page=100&sort=updated`);
+  const response = await fetchGitHubAPI(`/users/${username}/repos?per_page=100&sort=updated`);
   updateRateLimit(response);
   
   if (response.status === 403) {
@@ -962,10 +1221,13 @@ function displayRateLimit() {
 
 async function checkRateLimit() {
   try {
-    const response = await fetch(`${GITHUB_API_BASE}/rate_limit`);
+    const response = await fetchGitHubAPI('/rate_limit');
     const data = await response.json();
-    rateLimitInfo.remaining = data.rate.remaining;
-    rateLimitInfo.limit = data.rate.limit;
+    
+    // Use the appropriate rate limit based on authentication
+    const rateData = accessToken ? data.rate : data.rate;
+    rateLimitInfo.remaining = rateData.remaining;
+    rateLimitInfo.limit = rateData.limit;
     displayRateLimit();
   } catch (error) {
     console.error('Failed to check rate limit:', error);
@@ -1379,7 +1641,7 @@ async function handleReleaseGeneration() {
   releaseResults.classList.remove('hidden');
   
   try {
-    const response = await fetch(`${GITHUB_API_BASE}/repos/${username}/${repo}/commits?per_page=50`);
+    const response = await fetchGitHubAPI(`/repos/${username}/${repo}/commits?per_page=50`);
     updateRateLimit(response);
     
     if (response.status === 404) {
