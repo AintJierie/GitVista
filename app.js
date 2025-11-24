@@ -3,7 +3,7 @@ const GITHUB_API_BASE = 'https://api.github.com';
 
 // GitHub OAuth Configuration
 const GITHUB_OAUTH_CONFIG = {
-  clientId: 'YOUR_GITHUB_CLIENT_ID', // Replace with your GitHub OAuth App Client ID
+  clientId: 'Ov23lizjVXEM5Vjg0PIC', // Replace with your GitHub OAuth App Client ID
   redirectUri: 'https://aintjierie.github.io/GitVista/', // Correct repo name
   scope: 'read:user,repo,read:org',
   authUrl: 'https://github.com/login/oauth/authorize'
