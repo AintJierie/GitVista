@@ -2507,6 +2507,392 @@ kbd {
               color var(--duration-fast) var(--ease-standard);
 }
 
+/* Loading Skeleton Animations */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-secondary) 0%,
+    var(--color-secondary-hover) 50%,
+    var(--color-secondary) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+  border-radius: var(--radius-base);
+}
+
+.skeleton-text {
+  height: 16px;
+  margin-bottom: var(--space-8);
+}
+
+.skeleton-title {
+  height: 24px;
+  width: 60%;
+  margin-bottom: var(--space-16);
+}
+
+.skeleton-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-lg);
+}
+
+.skeleton-card {
+  height: 100px;
+  width: 100%;
+}
+
+/* Pulse Animation for Cards */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.pulse-animation {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Fade In Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s var(--ease-standard) forwards;
+}
+
+.fade-in-delayed {
+  animation: fadeIn 0.5s var(--ease-standard) 0.1s forwards;
+  opacity: 0;
+}
+
+/* Stat Card Hover Effects */
+.stat-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--color-teal-500-rgb), 0.1),
+    transparent
+  );
+  transition: left 0.5s var(--ease-standard);
+}
+
+.stat-card:hover::before {
+  left: 100%;
+}
+
+/* Glass morphism effect for cards */
+.glass-card {
+  background: rgba(var(--color-surface), 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(var(--color-border), 0.2);
+}
+
+/* Gradient backgrounds */
+.gradient-bg-1 {
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-1) 0%,
+    var(--color-bg-3) 100%
+  );
+}
+
+.gradient-bg-2 {
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-2) 0%,
+    var(--color-bg-6) 100%
+  );
+}
+
+/* Enhanced repo card with hover transform */
+.repo-item {
+  transition: all var(--duration-normal) var(--ease-standard);
+}
+
+.repo-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Activity Heatmap Grid */
+.activity-heatmap {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 14px);
+  gap: 3px;
+  padding: var(--space-16);
+  overflow-x: auto;
+}
+
+.activity-day {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: var(--color-secondary);
+  transition: all var(--duration-fast) var(--ease-standard);
+  cursor: pointer;
+  position: relative;
+}
+
+.activity-day:hover {
+  transform: scale(1.2);
+  z-index: 10;
+}
+
+.activity-day[data-level="0"] {
+  background: var(--color-secondary);
+}
+
+.activity-day[data-level="1"] {
+  background: rgba(var(--color-teal-500-rgb), 0.25);
+}
+
+.activity-day[data-level="2"] {
+  background: rgba(var(--color-teal-500-rgb), 0.5);
+}
+
+.activity-day[data-level="3"] {
+  background: rgba(var(--color-teal-500-rgb), 0.75);
+}
+
+.activity-day[data-level="4"] {
+  background: var(--color-teal-500);
+}
+
+/* Contribution Stats */
+.contribution-stats {
+  display: flex;
+  gap: var(--space-24);
+  padding: var(--space-16);
+  flex-wrap: wrap;
+}
+
+.contribution-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.contribution-stat-value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.contribution-stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* Trending Badge */
+.trending-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-8);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-orange-500-rgb), 0.15),
+    rgba(var(--color-red-500-rgb), 0.15)
+  );
+  border: 1px solid rgba(var(--color-orange-500-rgb), 0.3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-warning);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.trending-badge::before {
+  content: '🔥';
+  font-size: var(--font-size-sm);
+}
+
+/* Enhanced comparison cards */
+.developer-card {
+  position: relative;
+  overflow: hidden;
+  transition: all var(--duration-normal) var(--ease-standard);
+}
+
+.developer-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary),
+    var(--color-teal-400),
+    var(--color-primary)
+  );
+  transform: scaleX(0);
+  transition: transform var(--duration-normal) var(--ease-standard);
+}
+
+.developer-card:hover::after {
+  transform: scaleX(1);
+}
+
+/* Progress bars */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--color-secondary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary),
+    var(--color-teal-400)
+  );
+  border-radius: var(--radius-full);
+  transition: width 0.8s var(--ease-standard);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite linear;
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  background: var(--color-charcoal-700);
+  color: var(--color-gray-200);
+  padding: var(--space-8) var(--space-12);
+  border-radius: var(--radius-base);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all var(--duration-fast) var(--ease-standard);
+  z-index: 10000;
+  box-shadow: var(--shadow-lg);
+}
+
+.tooltip.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-theme="dark"] .tooltip {
+  background: var(--color-gray-200);
+  color: var(--color-charcoal-700);
+}
+
+/* Star rating visualization */
+.star-rating {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.star-icon {
+  color: var(--color-warning);
+  font-size: var(--font-size-lg);
+}
+
+.star-icon.filled {
+  animation: starPop 0.3s var(--ease-standard) forwards;
+}
+
+@keyframes starPop {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* Enhanced mobile navigation */
+@media (max-width: 768px) {
+  .nav-tabs {
+    position: sticky;
+    top: 0;
+    background: var(--color-surface);
+    z-index: 100;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .header-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .stat-card {
+    padding: var(--space-16);
+  }
+
+  .repo-item {
+    padding: var(--space-16);
+  }
+
+  .activity-heatmap {
+    grid-template-columns: repeat(auto-fill, 12px);
+    gap: 2px;
+  }
+
+  .activity-day {
+    width: 12px;
+    height: 12px;
+  }
+}
+
   .filter-buttons {
     width: 100%;
     overflow-x: auto;

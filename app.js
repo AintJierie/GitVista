@@ -527,7 +527,7 @@ function switchTab(tabName) {
 // Handle Search
 async function handleSearch() {
   const username = usernameInput.value.trim();
-  
+
   if (!username) {
     showError('Please enter a GitHub username');
     return;
@@ -535,17 +535,16 @@ async function handleSearch() {
 
   currentUsername = username;
   displayedReposCount = 5;
-  showLoading();
   hideError();
-  hideDashboard();
+  showLoadingSkeleton();
 
   try {
     // Check cache first
     const cacheKey = `user_${username}`;
     const cached = getCachedData(cacheKey);
-    
+
     let userData, reposData;
-    
+
     if (cached) {
       userData = cached.userData;
       reposData = cached.reposData;
@@ -555,30 +554,29 @@ async function handleSearch() {
         fetchUserData(username),
         fetchUserRepositories(username)
       ]);
-      
+
       // Cache the results
       setCachedData(cacheKey, { userData, reposData });
     }
 
     allRepositories = reposData;
     filteredRepositories = reposData;
-    
+
     displayUserProfile(userData);
     displayRepositoryStats(reposData);
     displayTopRepositories(reposData, repoSortBy);
     displayLanguageBreakdown(reposData);
     displayRecentActivity(reposData);
-    
+
     // Add to search history
     addToHistory(username);
-    
-    hideLoading();
+
     showDashboard();
-    
+
     // Show success notification
     showNotification(`Successfully loaded ${username}'s profile`, 'success');
   } catch (error) {
-    hideLoading();
+    hideDashboard();
     showError(error.message);
   }
 }
@@ -786,8 +784,13 @@ function renderRepositories() {
     return;
   }
   
-  reposContainer.innerHTML = reposToShow.map(repo => `
-    <div class="repo-item card">
+  reposContainer.innerHTML = reposToShow.map((repo, index) => {
+    // Check if repo is trending (high stars and recently updated)
+    const daysSinceUpdate = Math.floor((Date.now() - new Date(repo.updated_at)) / (1000 * 60 * 60 * 24));
+    const isTrending = repo.stargazers_count > 50 && daysSinceUpdate < 30;
+
+    return `
+    <div class="repo-item card fade-in" style="animation-delay: ${index * 0.05}s;">
       <div class="repo-header">
         <div class="repo-main-info">
           <a href="${repo.html_url}" target="_blank" class="repo-name">
@@ -799,6 +802,7 @@ function renderRepositories() {
           </a>
           ${repo.private ? '<span class="badge badge--private">Private</span>' : ''}
           ${repo.fork ? '<span class="badge badge--fork">Fork</span>' : ''}
+          ${isTrending ? '<span class="trending-badge">Trending</span>' : ''}
           <p class="repo-description">${repo.description || 'No description provided'}</p>
         </div>
         <button class="btn btn--icon btn--ghost copy-repo-btn" data-url="${repo.html_url}" title="Copy repository URL">
@@ -858,7 +862,8 @@ function renderRepositories() {
         </div>
       ` : ''}
     </div>
-  `).join('');
+  `;
+  }).join('');
   
   // Add copy button handlers
   document.querySelectorAll('.copy-repo-btn').forEach(btn => {
@@ -914,28 +919,28 @@ function handleRepoSearch(e) {
 // Display Language Breakdown
 function displayLanguageBreakdown(repos) {
   const languageCounts = {};
-  
+
   repos.forEach(repo => {
     if (repo.language) {
       languageCounts[repo.language] = (languageCounts[repo.language] || 0) + 1;
     }
   });
-  
+
   const sortedLanguages = Object.entries(languageCounts)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8);
-  
+
   const labels = sortedLanguages.map(([lang]) => lang);
   const data = sortedLanguages.map(([, count]) => count);
   const colors = labels.map(lang => getLanguageColor(lang));
-  
+
   const ctx = document.getElementById('language-chart');
-  
+
   // Destroy existing chart if it exists
   if (languageChart) {
     languageChart.destroy();
   }
-  
+
   languageChart = new Chart(ctx, {
     type: 'doughnut',
     data: {
@@ -977,6 +982,117 @@ function displayLanguageBreakdown(repos) {
       }
     }
   });
+
+  // Display enhanced insights
+  displayEnhancedInsights(repos);
+}
+
+// Display Enhanced Insights
+function displayEnhancedInsights(repos) {
+  const insightsSection = document.getElementById('insights-section');
+  if (!insightsSection) return;
+
+  insightsSection.style.display = 'block';
+  insightsSection.classList.add('fade-in');
+
+  // Calculate insights
+  const totalStars = repos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
+  const avgStarsPerRepo = repos.length > 0 ? Math.round(totalStars / repos.length) : 0;
+
+  // Estimate commits (using repo size as proxy)
+  const estimatedCommits = repos.reduce((sum, repo) => sum + Math.floor(repo.size / 10), 0);
+
+  // Most productive language (by repo count)
+  const langCounts = {};
+  repos.forEach(repo => {
+    if (repo.language) {
+      langCounts[repo.language] = (langCounts[repo.language] || 0) + 1;
+    }
+  });
+  const mostProductiveLang = Object.entries(langCounts)
+    .sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+
+  // Repos created this year
+  const currentYear = new Date().getFullYear();
+  const reposThisYear = repos.filter(repo => {
+    const createdYear = new Date(repo.created_at).getFullYear();
+    return createdYear === currentYear;
+  }).length;
+
+  // Update UI
+  document.getElementById('total-commits').textContent = formatNumber(estimatedCommits);
+  document.getElementById('avg-stars-per-repo').textContent = formatNumber(avgStarsPerRepo);
+  document.getElementById('most-productive-lang').textContent = mostProductiveLang;
+  document.getElementById('repo-growth').textContent = formatNumber(reposThisYear);
+
+  // Display size distribution
+  displaySizeDistribution(repos);
+}
+
+// Display Size Distribution
+function displaySizeDistribution(repos) {
+  const container = document.getElementById('size-distribution');
+  if (!container) return;
+
+  // Group repos by size
+  const sizeRanges = {
+    'Small (< 1MB)': 0,
+    'Medium (1-10MB)': 0,
+    'Large (10-100MB)': 0,
+    'Very Large (> 100MB)': 0
+  };
+
+  repos.forEach(repo => {
+    const sizeMB = repo.size / 1024;
+    if (sizeMB < 1) sizeRanges['Small (< 1MB)']++;
+    else if (sizeMB < 10) sizeRanges['Medium (1-10MB)']++;
+    else if (sizeMB < 100) sizeRanges['Large (10-100MB)']++;
+    else sizeRanges['Very Large (> 100MB)']++;
+  });
+
+  const maxCount = Math.max(...Object.values(sizeRanges));
+
+  container.innerHTML = Object.entries(sizeRanges).map(([range, count]) => {
+    const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+    return `
+      <div style="margin-bottom: var(--space-16);">
+        <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-4);">
+          <span style="font-size: var(--font-size-sm); color: var(--color-text-secondary);">${range}</span>
+          <span style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); color: var(--color-text);">${count}</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-bar-fill" style="width: ${percentage}%;"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Show loading skeleton
+function showLoadingSkeleton() {
+  const dashboard = document.getElementById('dashboard');
+  dashboard.innerHTML = `
+    <div class="fade-in">
+      <section class="profile-section">
+        <div class="card" style="padding: var(--space-24);">
+          <div style="display: flex; gap: var(--space-24);">
+            <div class="skeleton skeleton-avatar"></div>
+            <div style="flex: 1;">
+              <div class="skeleton skeleton-title"></div>
+              <div class="skeleton skeleton-text" style="width: 40%;"></div>
+              <div class="skeleton skeleton-text" style="width: 80%;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="stats-grid" style="margin-top: var(--space-20);">
+          ${Array(4).fill('').map(() => `
+            <div class="card skeleton skeleton-card"></div>
+          `).join('')}
+        </div>
+      </section>
+    </div>
+  `;
+  dashboard.classList.remove('hidden');
 }
 
 // Display Recent Activity
