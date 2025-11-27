@@ -701,29 +701,41 @@ async function fetchUserRepositories(username) {
 
 // Display User Profile
 function displayUserProfile(user) {
-  document.getElementById('user-avatar').src = user.avatar_url;
-  document.getElementById('user-name').textContent = user.name || user.login;
-  document.getElementById('user-link').href = user.html_url;
-  document.getElementById('user-link').textContent = `@${user.login}`;
-  
+  const userAvatar = document.getElementById('user-avatar');
+  if (userAvatar) userAvatar.src = user.avatar_url;
+
+  const userName = document.getElementById('user-name');
+  if (userName) userName.textContent = user.name || user.login;
+
+  const userLink = document.getElementById('user-link');
+  if (userLink) {
+    userLink.href = user.html_url;
+    userLink.textContent = `@${user.login}`;
+  }
+
   const bioElement = document.getElementById('user-bio');
-  if (user.bio) {
-    bioElement.textContent = user.bio;
-    bioElement.style.display = 'block';
-  } else {
-    bioElement.style.display = 'none';
+  if (bioElement) {
+    if (user.bio) {
+      bioElement.textContent = user.bio;
+      bioElement.style.display = 'block';
+    } else {
+      bioElement.style.display = 'none';
+    }
   }
-  
+
   const locationElement = document.getElementById('user-location');
-  if (user.location) {
-    locationElement.textContent = `📍 ${user.location}`;
-    locationElement.classList.remove('hidden');
-  } else {
-    locationElement.classList.add('hidden');
+  if (locationElement) {
+    if (user.location) {
+      locationElement.textContent = `📍 ${user.location}`;
+      locationElement.classList.remove('hidden');
+    } else {
+      locationElement.classList.add('hidden');
+    }
   }
-  
+
   // Public repos
-  document.getElementById('stat-repos').textContent = formatNumber(user.public_repos);
+  const statRepos = document.getElementById('stat-repos');
+  if (statRepos) statRepos.textContent = formatNumber(user.public_repos);
 
   // Private repo stats (only if self and data available)
   const privateReposEl = document.getElementById('stat-private-repos');
@@ -738,9 +750,15 @@ function displayUserProfile(user) {
       privateWrapper.classList.add('hidden');
     }
   }
-  document.getElementById('stat-followers').textContent = formatNumber(user.followers);
-  document.getElementById('stat-following').textContent = formatNumber(user.following);
-  document.getElementById('stat-gists').textContent = formatNumber(user.public_gists);
+
+  const statFollowers = document.getElementById('stat-followers');
+  if (statFollowers) statFollowers.textContent = formatNumber(user.followers);
+
+  const statFollowing = document.getElementById('stat-following');
+  if (statFollowing) statFollowing.textContent = formatNumber(user.following);
+
+  const statGists = document.getElementById('stat-gists');
+  if (statGists) statGists.textContent = formatNumber(user.public_gists);
 }
 
 // Display Repository Statistics
@@ -749,10 +767,15 @@ function displayRepositoryStats(repos) {
   const totalForks = repos.reduce((sum, repo) => sum + repo.forks_count, 0);
   const totalSize = repos.reduce((sum, repo) => sum + repo.size, 0);
   const avgSize = repos.length > 0 ? Math.round(totalSize / repos.length) : 0;
-  
-  document.getElementById('total-stars').textContent = formatNumber(totalStars);
-  document.getElementById('total-forks').textContent = formatNumber(totalForks);
-  document.getElementById('avg-size').textContent = `${formatNumber(avgSize)} KB`;
+
+  const totalStarsEl = document.getElementById('total-stars');
+  if (totalStarsEl) totalStarsEl.textContent = formatNumber(totalStars);
+
+  const totalForksEl = document.getElementById('total-forks');
+  if (totalForksEl) totalForksEl.textContent = formatNumber(totalForks);
+
+  const avgSizeEl = document.getElementById('avg-size');
+  if (avgSizeEl) avgSizeEl.textContent = `${formatNumber(avgSize)} KB`;
 }
 
 // Display Top Repositories
@@ -775,9 +798,11 @@ function displayTopRepositories(repos, sortBy = 'stars') {
 }
 
 function renderRepositories() {
-  const reposToShow = filteredRepositories.slice(0, displayedReposCount);
   const reposContainer = document.getElementById('top-repos');
-  
+  if (!reposContainer) return;
+
+  const reposToShow = filteredRepositories.slice(0, displayedReposCount);
+
   if (filteredRepositories.length === 0) {
     reposContainer.innerHTML = '<div class="empty-state">No repositories found</div>';
     loadMoreReposBtn.classList.add('hidden');
@@ -1097,12 +1122,13 @@ function showLoadingSkeleton() {
 
 // Display Recent Activity
 function displayRecentActivity(repos) {
+  const activityContainer = document.getElementById('recent-activity');
+  if (!activityContainer) return;
+
   const recentRepos = [...repos]
     .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
     .slice(0, 10);
-  
-  const activityContainer = document.getElementById('recent-activity');
-  
+
   activityContainer.innerHTML = recentRepos.map(repo => `
     <div class="activity-item card">
       <div class="activity-info">
